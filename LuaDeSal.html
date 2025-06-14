@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Lua de Sal Variedades</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+    header, footer { background: #4CAF50; color: white; text-align: center; padding: 1rem; }
+    .container { display: flex; flex-wrap: wrap; justify-content: center; padding: 1rem; }
+    .produto {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin: 1rem;
+      padding: 1rem;
+      width: 250px;
+      text-align: center;
+    }
+    .produto img { width: 100%; height: auto; }
+    .btn {
+      background: #4CAF50;
+      color: white;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 4px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    #abrir-carrinho {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 50px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      z-index: 999;
+    }
+    #carrinho-lateral {
+      position: fixed;
+      right: -300px;
+      top: 0;
+      width: 300px;
+      height: 100%;
+      background: white;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+      transition: right 0.3s ease;
+      z-index: 1000;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    #carrinho-lateral.ativo { right: 0; }
+    .item-carrinho {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 0.5rem;
+    }
+    .item-carrinho button {
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.2rem 0.5rem;
+      cursor: pointer;
+    }
+    #fechar { background: #ccc; color: #333; width: 100%; margin-bottom: 1rem; }
+    #finalizar { width: 100%; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Lua de Sal Variedades</h1>
+</header>
+
+<div class="container" id="produtos"></div>
+
+<button id="abrir-carrinho" onclick="abrirCarrinho()">🛒 Carrinho</button>
+
+<div id="carrinho-lateral">
+  <button id="fechar" onclick="fecharCarrinho()">Fechar</button>
+  <h2>Seu Carrinho</h2>
+  <div id="itens-carrinho"></div>
+  <button class="btn" id="finalizar" onclick="finalizarPedido()">Finalizar no WhatsApp</button>
+</div>
+
+<footer>
+  <p>&copy; 2025 - Lua de Sal Variedades</p>
+</footer>
+
+<script>
+  const produtos = [
+    { nome: "Apple Air Pods Pro modelo 2° geração", img: "https://imgur.com/MDdoWFT.jpg", preco: "R$ 99,99" },
+    { nome: "Apple Air Pods Pro modelo 3° geração", img: "https://imgur.com/6H0hXvd.jpg", preco: "R$ 99,99" },
+    { nome: "Bonecos Avengers articulados", img: "https://imgur.com/QMrnu7d.jpg", preco: "R$ 34,99" },
+    { nome: "Carregador iPhone Tipo C 1m", img: "https://imgur.com/JCiyAKf.jpg", preco: "R$ 11,99" },
+    { nome: "Carregador IPHONE 1m", img: "https://imgur.com/rWEUZjW.jpg", preco: "R$ 9,99" },
+    { nome: "Lanterna Tática Militar X900", img: "https://imgur.com/Y6guGNQ.jpg", preco: "R$ 63,99" },
+    { nome: "Fones com fio entrada P2", img: "https://imgur.com/AZII7zA.jpg", preco: "R$ 9,99" },
+    { nome: "Mini Lanterna Recarregável", img: "https://imgur.com/Jky2ddb.jpg", preco: "R$ 25,99" }
+  ];
+
+  const container = document.getElementById("produtos");
+  produtos.forEach(p => {
+    container.innerHTML += `
+      <div class="produto">
+        <img src="${p.img}" alt="${p.nome}">
+        <h2>${p.nome}</h2>
+        <p>${p.preco}</p>
+        <button class="btn" onclick="adicionarCarrinho('${p.nome} - ${p.preco}')">Adicionar</button>
+      </div>
+    `;
+  });
+
+  let carrinho = [];
+
+  function abrirCarrinho() {
+    document.getElementById('carrinho-lateral').classList.add('ativo');
+    atualizarCarrinho();
+  }
+
+  function fecharCarrinho() {
+    document.getElementById('carrinho-lateral').classList.remove('ativo');
+  }
+
+  function adicionarCarrinho(item) {
+    carrinho.push(item);
+    atualizarCarrinho();
+    alert(item + " adicionado ao carrinho.");
+  }
+
+  function removerItem(index) {
+    carrinho.splice(index, 1);
+    atualizarCarrinho();
+  }
+
+  function atualizarCarrinho() {
+    const container = document.getElementById("itens-carrinho");
+    container.innerHTML = "";
+
+    if (carrinho.length === 0) {
+      container.innerHTML = "<p>Seu carrinho está vazio.</p>";
+      return;
+    }
+
+    carrinho.forEach((item, index) => {
+      const div = document.createElement("div");
+      div.className = "item-carrinho";
+      div.innerHTML = `<span>${item}</span> <button onclick="removerItem(${index})">X</button>`;
+      container.appendChild(div);
+    });
+  }
+
+  function finalizarPedido() {
+    if (carrinho.length === 0) {
+      alert("Seu carrinho está vazio.");
+      return;
+    }
+    const numero = "5562993272451";
+    const mensagem = encodeURIComponent("Olá! Gostaria de comprar:\n\n" + carrinho.join("\n") + "\n\nNome:\nEndereço:\nForma de pagamento:");
+    const url = `https://wa.me/${numero}?text=${mensagem}`;
+    window.open(url, "_blank");
+  }
+</script>
+
+</body>
+</html>
